@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">DonationTracker</string>
+
+    <!-- Strings related to login -->
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="cancel">Cancel</string>
+    <string name="error_invalid_username">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">Incorrect login or password</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="passwords_must_match">Passwords must match</string>
+    <string name="repeat_password">Repeat password</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="user_already_exists">This user already exists</string>
+    <!-- ============================================ -->
+
+</resources>
