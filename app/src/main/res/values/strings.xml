@@ -1,14 +1,23 @@
 <resources>
     <string name="app_name">DonationTracker</string>
 
+    <!-- Back4App -->
+    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+    <string name="back4app_app_id">buvWQpgZEZUJcrslHSeypepw6oOUxTCBfFVaTzNN</string>
+    <string name="back4app_client_key">RlnFPE0VH4fzb2BNObBFcN62knLP4uHQHFYOvKED</string>
+    <string name="back4app_user_type_col_name">type</string>
+    <string name="back4app_user_locationId_col_name">locationId</string>
+
     <!-- Strings related to login -->
     <string name="login">Login</string>
+    <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_up">Sign up</string>
     <string name="cancel">Cancel</string>
-    <string name="error_invalid_username">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_invalid_username">The username is invalid</string>
+    <string name="error_invalid_email">The email is invalid</string>
+    <string name="error_invalid_password">The password is too short</string>
     <string name="error_incorrect_password">Incorrect login or password</string>
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email
@@ -19,6 +28,15 @@
     <string name="repeat_password">Repeat password</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="user_already_exists">This user already exists</string>
+    <string name="email_already_exists">This email already exists</string>
+    <string name="cannot_connect_to_server">Cannot connect to the server</string>
+    <string name="user_type">User type</string>
     <!-- ============================================ -->
+
+    <string-array name="user_types">
+        <item>User</item>
+        <item>Location Employee</item>
+        <item>Admin</item>
+    </string-array>
 
 </resources>

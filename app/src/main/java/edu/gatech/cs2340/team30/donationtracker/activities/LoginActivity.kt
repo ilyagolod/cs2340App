@@ -12,11 +12,14 @@ import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import com.parse.Parse
+import com.parse.ParseInstallation
+import com.parse.ParseUser
 import edu.gatech.cs2340.team30.donationtracker.R
-import edu.gatech.cs2340.team30.donationtracker.model.Globals
-import edu.gatech.cs2340.team30.donationtracker.model.User
+import edu.gatech.cs2340.team30.donationtracker.model.*
 
 import kotlinx.android.synthetic.main.activity_login.*
+import java.security.MessageDigest
 
 /**
  * A login screen that offers login via email/password.
@@ -46,6 +49,17 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, RegistrationActivity::class.java))
             finish()
         }
+
+
+        Parse.initialize(Parse.Configuration.Builder(this)
+                .applicationId(getString(R.string.back4app_app_id))
+                .clientKey(getString (R.string.back4app_client_key))
+                .server(getString(R.string.back4app_server_url))
+                .build())
+
+        ParseInstallation.getCurrentInstallation().saveInBackground()
+
+
     }
 
 
@@ -165,23 +179,29 @@ class LoginActivity : AppCompatActivity() {
         : AsyncTask<Void, Void, Boolean>() {
 
         override fun doInBackground(vararg params: Void): Boolean? {
-            // TODO: attempt authentication against a network service.
+
+            val md = MessageDigest.getInstance("SHA-256")
+            val hashedPwd = String(md.digest(mPassword.toByteArray()))
 
             try {
-                // Simulate network access.
-                Thread.sleep(2000)
-            } catch (e: InterruptedException) {
+                ParseUser.logIn(mUsername, hashedPwd)
+            } catch (e: Exception) {
                 return false
             }
 
-            val user = User(mUsername, mPassword)
-            val ind = Globals.users.indexOf(user)
+            val parseUser = ParseUser.getCurrentUser()
+            val type: String
+                    = parseUser.getString(getString(R.string.back4app_user_type_col_name))
 
-            if (ind == -1) return false
+            val user = when (type) {
+                "ADMIN" -> Admin(parseUser.username, hashedPwd, parseUser.email)
+                "LOCATION_EMPLOYEE" ->
+                    LocationEmployee(parseUser.username, hashedPwd, parseUser.email,
+                            parseUser.getString(getString(R.string.back4app_user_locationId_col_name)))
+                else -> SimpleUser(parseUser.username, hashedPwd, parseUser.email)
+            }
 
-            if (Globals.users[ind].hashedPassword != mPassword) return false
-
-            Globals.curUser = Globals.users[ind]
+            Globals.curUser = user
             return true
         }
 

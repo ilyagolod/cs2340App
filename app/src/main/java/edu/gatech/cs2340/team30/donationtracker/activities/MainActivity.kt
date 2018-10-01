@@ -8,10 +8,16 @@ import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import com.parse.Parse
+import com.parse.ParseUser
 import edu.gatech.cs2340.team30.donationtracker.R
+import edu.gatech.cs2340.team30.donationtracker.model.Admin
 import edu.gatech.cs2340.team30.donationtracker.model.Globals
+import edu.gatech.cs2340.team30.donationtracker.model.LocationEmployee
+import edu.gatech.cs2340.team30.donationtracker.model.SimpleUser
 
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,6 +30,20 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(view, "Current user is ${Globals.curUser}", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
         }
+
+        Parse.initialize(Parse.Configuration.Builder(this)
+                .applicationId(getString(R.string.back4app_app_id))
+                .clientKey(getString (R.string.back4app_client_key))
+                .server(getString(R.string.back4app_server_url))
+                .build())
+
+
+        val userType = when(Globals.curUser!!::class) {
+            Admin::class -> "ADMIN"
+            LocationEmployee::class -> "LOCATION_EMPLOYEE"
+            else -> "USER"
+        }
+        test_textview_main.text = "Your user type is ${userType}"
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -36,6 +56,7 @@ class MainActivity : AppCompatActivity() {
 
         if (id == R.id.main_action_logout) {
             Globals.curUser = null
+            ParseUser.logOutInBackground()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }

@@ -8,4 +8,9 @@
     tools:context=".activities.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/test_textview_main"/>
+
 </android.support.constraint.ConstraintLayout>
