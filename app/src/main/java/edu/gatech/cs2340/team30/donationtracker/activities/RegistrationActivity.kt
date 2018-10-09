@@ -211,7 +211,7 @@ class RegistrationActivity : AppCompatActivity() {
 
                 val user = ParseUser()
                 user.username = mUsername
-                user.email = mEmail
+                user.email = mEmail.toLowerCase()
                 user.setPassword(hashedPwd)
                 user.put(getString(R.string.back4app_user_type_col_name), mType)
                 user.signUp()
