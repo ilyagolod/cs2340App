@@ -1,12 +1,14 @@
 package edu.gatech.cs2340.team30.donationtracker.model
 
 class Location(val id: String, val name: String, val latitude: Float?, val longitude: Float?,
-               val adress: String?, val city: String?, val state: String?, val zip: String?,
-               val locationType: LocationType?, val phone: String?, val website: String?) {
+               val address: String?, val city: String?, val state: String?, val zip: String?,
+               val type: LocationType?, val phone: String?, val website: String?) {
 
     constructor(id: String, name: String)
             : this (id, name, null, null, null,
             null, null, null, null, null, null)
+
+    constructor() : this("", "")
 
     override fun toString(): String {
         return name

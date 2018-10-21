@@ -18,10 +18,10 @@ import android.widget.TextView
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.Toast
-import com.parse.Parse
-import com.parse.ParseUser
+import com.parse.*
 import edu.gatech.cs2340.team30.donationtracker.model.Globals
 import edu.gatech.cs2340.team30.donationtracker.model.Location
+import edu.gatech.cs2340.team30.donationtracker.model.LocationType
 import kotlinx.android.synthetic.main.location_list_content.*
 import kotlinx.android.synthetic.main.location_list_content.view.*
 import kotlinx.android.synthetic.main.nav_header_main.*
@@ -37,10 +37,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
+//        fab.setOnClickListener { view ->
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                    .setAction("Action", null).show()
+//        }
 
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -60,6 +60,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             ParseUser.logOutInBackground()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
+        }
+
+        val query = ParseQuery.getQuery<ParseObject>("Location")
+        //query.whereEqualTo("playerName", "Dan Stemkoski")
+        query.findInBackground { scoreList, e ->
+            if (e == null) {
+                Globals.locations.clear()
+                for(location in scoreList) {
+                    saveLocationFromParseObject(location)
+                }
+            } else {
+                // TODO Handle no connection and other errors
+            }
         }
 
         nav_view_main.getHeaderView(0).nav_bar_username.text = Globals.curUser!!.username
@@ -106,20 +119,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_slideshow -> {
 
             }
-            R.id.nav_manage -> {
-
-            }
-            R.id.nav_share -> {
-
-            }
-            R.id.nav_send -> {
-
+            R.id.main_drawer_logout -> {
+                Globals.curUser = null
+                ParseUser.logOutInBackground()
+                startActivity(Intent(this, LoginActivity::class.java))
+                finish()
             }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
+
+    private fun saveLocationFromParseObject(location: ParseObject) {
+            val cur = Location(id = location.objectId, name = location.getString("name"),
+                    latitude = location.getNumber("latitude").toFloat(),
+                    longitude = location.getNumber("longitude").toFloat(),
+                    address = location.getString("address"),
+                    city = location.getString("city"),
+                    state = location.getString("state"),
+                    zip = location.getString("zip"),
+                    type = LocationType.values()[location.getNumber("type").toInt()],
+                    phone = location.getString("phone"),
+                    website = location.getString("website"))
+            Globals.locations.add(cur)
+        }
 
     inner class LocationsAdapter(private val myDataset: ArrayList<Location>) :
             RecyclerView.Adapter<LocationsAdapter.MyViewHolder>() {
@@ -136,8 +160,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             init {
                 this.textView = view.location_list_item_text
                 view.setOnClickListener {
-                    Toast.makeText(applicationContext, "Number $adapterPosition",
-                            Toast.LENGTH_SHORT).show()
+                    val startIntent = Intent(this@MainActivity,
+                            LocationViewActivity::class.java).apply {
+                        putExtra("locationIndex", adapterPosition)
+                    }
+                    startActivity(startIntent)
+
                 }
             }
 
