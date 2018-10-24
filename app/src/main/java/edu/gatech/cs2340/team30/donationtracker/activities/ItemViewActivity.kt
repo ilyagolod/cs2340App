@@ -7,29 +7,31 @@ import android.support.v7.app.AppCompatActivity
 import edu.gatech.cs2340.team30.donationtracker.R
 import edu.gatech.cs2340.team30.donationtracker.R.id.toolbar
 import edu.gatech.cs2340.team30.donationtracker.model.Globals
+import edu.gatech.cs2340.team30.donationtracker.model.Item
 import edu.gatech.cs2340.team30.donationtracker.model.Location
+import kotlinx.android.synthetic.main.activity_item_view.*
 
 import kotlinx.android.synthetic.main.activity_location_view.*
 import kotlinx.android.synthetic.main.content_location_view.*
+import java.text.SimpleDateFormat
 
-class LocationViewActivity : AppCompatActivity() {
+class ItemViewActivity : AppCompatActivity() {
 
-    lateinit var location: Location
+    lateinit var item: Item
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_location_view)
-        setSupportActionBar(toolbar)
+        setContentView(R.layout.activity_item_view)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        item = intent.getParcelableExtra("item")
 
-        location = Globals.locations[intent.getStringExtra("locationId")]!!
+        name_textview_item_view.text = item.name
+        category_textview_item_view.text = item.category.toString()
+        value_textview_item_view.text = "\$${item.value}"
+        description_textview_item_view.text = item.description
 
-        name_textview_locationview.text = location.name
-        type_textview_locationview.text = location.type.toString()
-        coordinates_textview_locationview.text = "${location.latitude}, ${location.longitude}"
-        address_textview_locationview.text = location.address
-        phone_textview_locationview.text = location.phone
+        val df = SimpleDateFormat.getDateTimeInstance()
+        time_textview_item_view.text = df.format(item.createdAt)
 
     }
 

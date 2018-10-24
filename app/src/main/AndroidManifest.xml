@@ -55,6 +55,10 @@
             android:label="Locations"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".activities.ItemsViewActivity"
+            android:label="Items"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".activities.LocationViewActivity"
             android:label="Location Info"
             android:parentActivityName=".activities.MainActivity"
@@ -63,6 +67,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.gatech.cs2340.team30.donationtracker.activities.MainActivity" />
         </activity>
+        <activity
+            android:name=".activities.EditItemActivity"
+            android:label="Edit Item"
+            android:parentActivityName=".activities.LocationViewActivity"/>
+        <activity
+            android:name=".activities.ItemViewActivity"
+            android:label="Item Info"
+            android:parentActivityName=".activities.LocationViewActivity"/>
     </application>
 
 </manifest>

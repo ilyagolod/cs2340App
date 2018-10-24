@@ -1,7 +1,7 @@
 package edu.gatech.cs2340.team30.donationtracker.activities
 
 import android.content.Intent
-import android.graphics.Typeface
+import android.opengl.Visibility
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
@@ -15,27 +15,25 @@ import android.widget.TextView
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import com.parse.*
-import edu.gatech.cs2340.team30.donationtracker.model.Globals
-import edu.gatech.cs2340.team30.donationtracker.model.Location
-import edu.gatech.cs2340.team30.donationtracker.model.LocationEmployee
-import edu.gatech.cs2340.team30.donationtracker.model.LocationType
+import edu.gatech.cs2340.team30.donationtracker.model.*
 import kotlinx.android.synthetic.main.location_list_content.view.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    lateinit var locationsAdapter: RecyclerView.Adapter<*>
+    lateinit var itemsAdapter: RecyclerView.Adapter<*>
+
+    val items = ArrayList<Item>()
+
+    lateinit var locationIds: Array<String>
+
+    var canEdit: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-//        fab.setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show()
-//        }
 
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -44,8 +42,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         nav_view_main.setNavigationItemSelectedListener(this)
-
-        fab_main.visibility = View.INVISIBLE
 
         Parse.initialize(Parse.Configuration.Builder(this)
                 .applicationId(getString(R.string.back4app_app_id))
@@ -59,21 +55,54 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             finish()
         }
 
-        val query = ParseQuery.getQuery<ParseObject>("Location")
-        //query.whereEqualTo("playerName", "Dan Stemkoski")
-        val objects = query.find()
+        locationIds = intent.getStringArrayExtra("locationIds")
 
-        Globals.locations.clear()
-        for(location in objects) {
-                saveLocationFromParseObject(location)
+
+        if(Globals.curUser is LocationEmployee && locationIds.size == 1
+                && (Globals.curUser as LocationEmployee).locationId == locationIds[0]) {
+            canEdit = true
         }
+
+        updateItems()
+
 
         nav_view_main.getHeaderView(0).nav_bar_username.text = Globals.curUser!!.username
         nav_view_main.getHeaderView(0).nav_bar_email.text = Globals.curUser!!.email
 
 
-        locationsAdapter = LocationsAdapter(ArrayList(Globals.locations.values))
-        locations_list_main.adapter = locationsAdapter
+        if(canEdit) {
+            fab_main.visibility = View.VISIBLE
+        }
+
+        fab_main.setOnClickListener { view ->
+            val startIntent = Intent(this@ItemsViewActivity,
+                    EditItemActivity::class.java).apply {
+                //putExtra("item", myDataset[adapterPosition])
+                putExtra("locationId", locationIds[0])
+            }
+            startActivity(startIntent)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateItems()
+    }
+
+    private fun updateItems() {
+        val query = ParseQuery.getQuery<ParseObject>("Item")
+        query.whereContainedIn("locationId", locationIds.asList())
+
+        items.clear()
+
+        val objects = query.find()
+        for(o in objects) {
+            items.add(getItemFromParseObject(o))
+        }
+
+        itemsAdapter = ItemsAdapter(items)
+        locations_list_main.adapter = itemsAdapter
+
     }
 
     override fun onBackPressed() {
@@ -104,17 +133,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Handle navigation view item clicks here.
         when (item.itemId) {
             R.id.nav_locations -> {
-                // Handle the camera action
-            }
-            R.id.nav_items -> {
-                val startIntent = Intent(this,
-                        ItemsViewActivity::class.java).apply {
-                    putExtra("locationIds", Globals.locations.map { x -> x.value.id }.toTypedArray())
-                }
-                startActivity(startIntent)
+                startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
+            R.id.nav_items -> {
 
+            }
             R.id.main_drawer_logout -> {
                 Globals.curUser = null
                 ParseUser.logOutInBackground()
@@ -127,22 +151,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
-    private fun saveLocationFromParseObject(location: ParseObject) {
-            val cur = Location(id = location.objectId, name = location.getString("name"),
-                    latitude = location.getNumber("latitude").toFloat(),
-                    longitude = location.getNumber("longitude").toFloat(),
-                    address = location.getString("address"),
-                    city = location.getString("city"),
-                    state = location.getString("state"),
-                    zip = location.getString("zip"),
-                    type = LocationType.values()[location.getNumber("type").toInt()],
-                    phone = location.getString("phone"),
-                    website = location.getString("website"))
-        Globals.locations[cur.id] = cur
+    private fun getItemFromParseObject(item: ParseObject): Item{
+            val result = Item(id = item.objectId, name = item.getString("name"),
+                    description = item.getString("description"),
+                    value = item.getNumber("value").toFloat(),
+                    category = ItemCategory.values()[item.getNumber("category").toInt()],
+                    locationId = item.getString("locationId"),
+                    createdAt = item.createdAt)
+
+            return result
         }
 
-    inner class LocationsAdapter(private val myDataset: ArrayList<Location>) :
-            RecyclerView.Adapter<LocationsAdapter.MyViewHolder>() {
+    inner class ItemsAdapter(private val myDataset: ArrayList<Item>) :
+            RecyclerView.Adapter<ItemsAdapter.MyViewHolder>() {
 
         // Provide a reference to the views for each data item
         // Complex data items may need more than one view per item, and
@@ -151,23 +172,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         inner class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
 
-            val textView: TextView
+            val textView: TextView = view.location_list_item_text
 
             init {
-                this.textView = view.location_list_item_text
                 view.setOnLongClickListener {
-                    val startIntent = Intent(this@MainActivity,
-                            LocationViewActivity::class.java).apply {
-                        putExtra("locationId", myDataset[adapterPosition].id)
+
+                    if (!canEdit) return@setOnLongClickListener true
+
+                    val startIntent = Intent(this@ItemsViewActivity,
+                            EditItemActivity::class.java).apply {
+                        putExtra("item", myDataset[adapterPosition])
+                        putExtra("locationId", myDataset[adapterPosition].locationId)
                     }
                     startActivity(startIntent)
+
                     return@setOnLongClickListener true
                 }
 
                 view.setOnClickListener {
-                    val startIntent = Intent(this@MainActivity,
-                            ItemsViewActivity::class.java).apply {
-                        putExtra("locationIds", arrayOf(myDataset[adapterPosition].id))
+                    val startIntent = Intent(this@ItemsViewActivity,
+                            ItemViewActivity::class.java).apply {
+                        putExtra("item", myDataset[adapterPosition])
                     }
                     startActivity(startIntent)
                 }
@@ -179,7 +204,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         // Create new views (invoked by the layout manager)
         override fun onCreateViewHolder(parent: ViewGroup,
-                                        viewType: Int): LocationsAdapter.MyViewHolder {
+                                        viewType: Int): ItemsAdapter.MyViewHolder {
             // create a new view
             val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.location_list_content, parent, false)
@@ -195,10 +220,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
             holder.textView.text = myDataset[position].toString()
-            if(Globals.curUser is LocationEmployee
-                    && (Globals.curUser as LocationEmployee).locationId == myDataset[position].id) {
-                holder.textView.setTypeface(null, Typeface.BOLD)
-            }
         }
 
 

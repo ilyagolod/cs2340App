@@ -4,6 +4,8 @@ class Location(val id: String, val name: String, val latitude: Float?, val longi
                val address: String?, val city: String?, val state: String?, val zip: String?,
                val type: LocationType?, val phone: String?, val website: String?) {
 
+    val items = ArrayList<Item>()
+
     constructor(id: String, name: String)
             : this (id, name, null, null, null,
             null, null, null, null, null, null)
