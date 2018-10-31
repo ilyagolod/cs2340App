@@ -13,7 +13,11 @@ import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import android.widget.TextView
 import android.support.v7.widget.RecyclerView
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import com.parse.*
 import edu.gatech.cs2340.team30.donationtracker.model.*
 import kotlinx.android.synthetic.main.location_list_content.view.*
@@ -82,11 +86,63 @@ class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             }
             startActivity(startIntent)
         }
+
+        items_search_layout.visibility = View.VISIBLE
+        this.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+
+        val searchCategories = arrayOf("All") + (ItemCategory.values().map { x -> x.toString()})
+        items_search_spinner.adapter = ArrayAdapter<String>(this,
+                R.layout.support_simple_spinner_dropdown_item, searchCategories)
+
+        items_search_textbox.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                updateSearchFilter()
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+        })
+
+        items_search_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                updateSearchFilter()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
         updateItems()
+    }
+
+    private fun updateSearchFilter() {
+        val searchStr = items_search_textbox.text.toString()
+        val category = items_search_spinner.selectedItemId.toInt()
+        var newItems = items
+
+        if (searchStr != "") {
+            newItems = ArrayList(newItems.filter { x ->
+                x.name.toLowerCase().contains(searchStr.toLowerCase()) })
+        }
+        if (category != 0) {
+            newItems = ArrayList(newItems.filter { x ->
+                x.category == ItemCategory.values()[category - 1] })
+        }
+
+        if (newItems.size == 0) items_search_not_found_textview.visibility = View.VISIBLE
+        else items_search_not_found_textview.visibility = View.GONE
+
+        itemsAdapter = ItemsAdapter(newItems)
+        locations_list_main.adapter = itemsAdapter
+
     }
 
     private fun updateItems() {
@@ -227,4 +283,6 @@ class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         // Return the size of your dataset (invoked by the layout manager)
         override fun getItemCount() = myDataset.size
     }
+
+
 }
