@@ -44,32 +44,33 @@ class EditItemActivity : AppCompatActivity() {
                 .build())
 
         save_button_edit_item.setOnClickListener {
-
-            val name = name_textbox_edit_item.text.toString()
-            val value = try {parseFloat(value_textbox_edit_item.text.toString())}
-                        catch (e: Exception) {null}
-            val description = desctiprion_texbox_edit_item.text.toString()
-            val category = ItemCategory.values()[category_spinner_edit_item.selectedItemId.toInt()]
-
-            if (name == "" || value == null) return@setOnClickListener
-
-            val obj: ParseObject
-            if (item == null) {
-                obj = ParseObject("Item")
-            } else {
-                val query = ParseQuery.getQuery<ParseObject>("Item")
-                obj = query.get(item!!.id)
-            }
-            obj.put("name", name)
-            obj.put("value", value)
-            obj.put("description", description)
-            obj.put("category", category.ordinal)
-            obj.put("locationId", locationId)
-            obj.save()
-            finish()
+            updateParseItem(name_textbox_edit_item.text.toString(),
+                    try {parseFloat(value_textbox_edit_item.text.toString())}
+                    catch (e: Exception) {null}, desctiprion_texbox_edit_item.text.toString(),
+                    ItemCategory.values()[category_spinner_edit_item.selectedItemId.toInt()])
         }
 
 
+    }
+
+    private fun updateParseItem(name: String, value: Float?, description: String,
+                                category: ItemCategory) {
+        if (name == "" || value == null) return
+
+        val obj: ParseObject
+        if (item == null) {
+            obj = ParseObject("Item")
+        } else {
+            val query = ParseQuery.getQuery<ParseObject>("Item")
+            obj = query.get(item!!.id)
+        }
+        obj.put("name", name)
+        obj.put("value", value)
+        obj.put("description", description)
+        obj.put("category", category.ordinal)
+        obj.put("locationId", locationId)
+        obj.save()
+        finish()
     }
 
 

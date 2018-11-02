@@ -207,30 +207,11 @@ class RegistrationActivity : AppCompatActivity() {
 
             val md = MessageDigest.getInstance("SHA-256")
             val hashedPwd = String(md.digest(mPassword.toByteArray()))
-            try {
 
-                val user = ParseUser()
-                user.username = mUsername
-                user.email = mEmail.toLowerCase()
-                user.setPassword(hashedPwd)
-                user.put(getString(R.string.back4app_user_type_col_name), mType)
-                user.signUp()
+            errorCode = User.registerUser(this@RegistrationActivity, mUsername,
+                    hashedPwd, mEmail, mType)
 
-            } catch (e: ParseException) {
-                Log.d("SIGN_UP", e.message)
-                errorCode = e.code
-                return false
-            }
-
-
-            val user = when(mType) {
-                "ADMIN" -> Admin(mUsername, hashedPwd, mEmail)
-                "LOCATION_EMPLOYEE" -> LocationEmployee(mUsername, hashedPwd, mEmail)
-                else -> SimpleUser(mUsername, hashedPwd, mEmail)
-            }
-
-            Globals.curUser = user
-            return true
+            return errorCode == 0
         }
 
         override fun onPostExecute(success: Boolean?) {

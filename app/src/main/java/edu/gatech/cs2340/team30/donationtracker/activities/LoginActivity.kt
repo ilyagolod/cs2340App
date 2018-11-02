@@ -14,7 +14,6 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import com.parse.Parse
 import com.parse.ParseInstallation
-import com.parse.ParseUser
 import edu.gatech.cs2340.team30.donationtracker.R
 import edu.gatech.cs2340.team30.donationtracker.model.*
 
@@ -183,26 +182,7 @@ class LoginActivity : AppCompatActivity() {
             val md = MessageDigest.getInstance("SHA-256")
             val hashedPwd = String(md.digest(mPassword.toByteArray()))
 
-            try {
-                ParseUser.logIn(mUsername, hashedPwd)
-            } catch (e: Exception) {
-                return false
-            }
-
-            val parseUser = ParseUser.getCurrentUser()
-            val type: String
-                    = parseUser.getString(getString(R.string.back4app_user_type_col_name))
-
-            val user = when (type) {
-                "ADMIN" -> Admin(parseUser.username, hashedPwd, parseUser.email)
-                "LOCATION_EMPLOYEE" ->
-                    LocationEmployee(parseUser.username, hashedPwd, parseUser.email,
-                            parseUser.getString(getString(R.string.back4app_user_locationId_col_name)))
-                else -> SimpleUser(parseUser.username, hashedPwd, parseUser.email)
-            }
-
-            Globals.curUser = user
-            return true
+            return User.loginUser(this@LoginActivity, mUsername, hashedPwd)
         }
 
         override fun onPostExecute(success: Boolean?) {
