@@ -67,7 +67,7 @@ class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             canEdit = true
         }
 
-        updateItems()
+        refreshItems()
 
 
         nav_view_main.getHeaderView(0).nav_bar_username.text = Globals.curUser!!.username
@@ -120,7 +120,7 @@ class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     override fun onResume() {
         super.onResume()
-        updateItems()
+        refreshItems()
     }
 
     private fun updateSearchFilter() {
@@ -145,7 +145,7 @@ class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     }
 
-    private fun updateItems() {
+    private fun refreshItems() {
         val query = ParseQuery.getQuery<ParseObject>("Item")
         query.whereContainedIn("locationId", locationIds.asList())
 
