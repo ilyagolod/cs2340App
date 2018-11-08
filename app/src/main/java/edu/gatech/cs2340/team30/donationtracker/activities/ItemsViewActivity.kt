@@ -1,7 +1,6 @@
 package edu.gatech.cs2340.team30.donationtracker.activities
 
 import android.content.Intent
-import android.opengl.Visibility
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
@@ -20,7 +19,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.parse.*
 import edu.gatech.cs2340.team30.donationtracker.model.*
-import kotlinx.android.synthetic.main.location_list_content.view.*
+import kotlinx.android.synthetic.main.items_list_content.view.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 
 
@@ -180,7 +179,7 @@ class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         when (item.itemId) {
-            R.id.action_settings -> return true
+            R.id.show_map_main -> return true
             else -> return super.onOptionsItemSelected(item)
         }
     }
@@ -228,7 +227,8 @@ class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         inner class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
 
-            val textView: TextView = view.location_list_item_text
+            val nameTextView: TextView = view.items_list_name_textview
+            val categoryTextView: TextView = view.items_list_category_textview
 
             init {
                 view.setOnLongClickListener {
@@ -263,7 +263,7 @@ class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                                         viewType: Int): ItemsAdapter.MyViewHolder {
             // create a new view
             val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.location_list_content, parent, false)
+                    .inflate(R.layout.items_list_content, parent, false)
 
 
             // set the view's size, margins, paddings and layout parameters
@@ -275,7 +275,8 @@ class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-            holder.textView.text = myDataset[position].toString()
+            holder.nameTextView.text = myDataset[position].toString()
+            holder.categoryTextView.text = myDataset[position].category.toString()
         }
 
 

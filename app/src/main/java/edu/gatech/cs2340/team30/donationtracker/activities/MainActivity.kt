@@ -95,7 +95,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         when (item.itemId) {
-            R.id.action_settings -> return true
+            R.id.show_map_main -> {
+                val startIntent = Intent(this, MapActivity::class.java)
+                startActivity(startIntent)
+                return true
+            }
             else -> return super.onOptionsItemSelected(item)
         }
     }
