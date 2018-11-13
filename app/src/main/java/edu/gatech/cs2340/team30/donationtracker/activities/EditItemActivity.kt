@@ -1,23 +1,23 @@
 package edu.gatech.cs2340.team30.donationtracker.activities
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.widget.ArrayAdapter
 import com.parse.Parse
 import com.parse.ParseObject
+import com.parse.ParseQuery
 import edu.gatech.cs2340.team30.donationtracker.R
+import edu.gatech.cs2340.team30.donationtracker.model.Globals
 import edu.gatech.cs2340.team30.donationtracker.model.Item
 import edu.gatech.cs2340.team30.donationtracker.model.ItemCategory
 import kotlinx.android.synthetic.main.activity_edit_item.*
-import com.parse.ParseQuery
 import java.lang.Float.parseFloat
-import java.lang.Integer.parseInt
 
 
 class EditItemActivity : AppCompatActivity() {
 
     var item: Item? = null
-    lateinit var locationId: String
+    private lateinit var locationId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,11 +37,7 @@ class EditItemActivity : AppCompatActivity() {
             category_spinner_edit_item.setSelection(item!!.category.ordinal)
         }
 
-        Parse.initialize(Parse.Configuration.Builder(this)
-                .applicationId(getString(R.string.back4app_app_id))
-                .clientKey(getString (R.string.back4app_client_key))
-                .server(getString(R.string.back4app_server_url))
-                .build())
+        Globals.dbHandler.initParse(this)
 
         save_button_edit_item.setOnClickListener {
             updateParseItem(name_textbox_edit_item.text.toString(),
@@ -58,11 +54,11 @@ class EditItemActivity : AppCompatActivity() {
         if (name == "" || value == null) return
 
         val obj: ParseObject
-        if (item == null) {
-            obj = ParseObject("Item")
+        obj = if (item == null) {
+            ParseObject("Item")
         } else {
             val query = ParseQuery.getQuery<ParseObject>("Item")
-            obj = query.get(item!!.id)
+            query.get(item!!.id)
         }
         obj.put("name", name)
         obj.put("value", value)

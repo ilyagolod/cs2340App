@@ -1,36 +1,20 @@
 package edu.gatech.cs2340.team30.donationtracker.activities
 
-import android.graphics.Color
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-
+import android.support.v7.app.AppCompatActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import edu.gatech.cs2340.team30.donationtracker.R
 import edu.gatech.cs2340.team30.donationtracker.model.Globals
 import edu.gatech.cs2340.team30.donationtracker.model.Location
-import android.widget.TextView
-import android.graphics.Typeface
-import android.view.Gravity
-import android.view.View
-import android.widget.LinearLayout
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.CameraUpdate
-
-
-
-
-
 
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
-
-    private lateinit var mMap: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

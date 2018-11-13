@@ -25,11 +25,11 @@ import kotlinx.android.synthetic.main.nav_header_main.view.*
 
 class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    lateinit var itemsAdapter: RecyclerView.Adapter<*>
+    private lateinit var itemsAdapter: RecyclerView.Adapter<*>
 
-    val items = ArrayList<Item>()
+    private val items = ArrayList<Item>()
 
-    lateinit var locationIds: Array<String>
+    private lateinit var locationIds: Array<String>
 
     var canEdit: Boolean = false
 
@@ -39,18 +39,15 @@ class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         setSupportActionBar(toolbar)
 
         val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+                this, drawer_layout, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
 
         nav_view_main.setNavigationItemSelectedListener(this)
 
-        Parse.initialize(Parse.Configuration.Builder(this)
-                .applicationId(getString(R.string.back4app_app_id))
-                .clientKey(getString (R.string.back4app_client_key))
-                .server(getString(R.string.back4app_server_url))
-                .build())
+        Globals.dbHandler.initParse(this)
 
         if (Globals.curUser == null) {
             ParseUser.logOutInBackground()
@@ -107,7 +104,8 @@ class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
         items_search_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int,
+                                        id: Long) {
                 updateSearchFilter()
             }
 
@@ -178,9 +176,9 @@ class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
-            R.id.show_map_main -> return true
-            else -> return super.onOptionsItemSelected(item)
+        return when (item.itemId) {
+            R.id.show_map_main -> true
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -207,15 +205,14 @@ class ItemsViewActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     }
 
     private fun getItemFromParseObject(item: ParseObject): Item{
-            val result = Item(id = item.objectId, name = item.getString("name"),
-                    description = item.getString("description"),
-                    value = item.getNumber("value").toFloat(),
-                    category = ItemCategory.values()[item.getNumber("category").toInt()],
-                    locationId = item.getString("locationId"),
-                    createdAt = item.createdAt)
 
-            return result
-        }
+        return Item(id = item.objectId, name = item.getString("name"),
+                description = item.getString("description"),
+                value = item.getNumber("value").toFloat(),
+                category = ItemCategory.values()[item.getNumber("category").toInt()],
+                locationId = item.getString("locationId"),
+                createdAt = item.createdAt)
+    }
 
     inner class ItemsAdapter(private val myDataset: ArrayList<Item>) :
             RecyclerView.Adapter<ItemsAdapter.MyViewHolder>() {

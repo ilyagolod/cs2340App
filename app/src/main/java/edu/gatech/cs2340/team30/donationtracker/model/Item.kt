@@ -4,7 +4,9 @@ import android.os.Parcel
 import android.os.Parcelable
 import java.util.*
 
-
+/**
+ * Represents an item donated at some location
+ */
 class Item(val id: String, val name: String, val description: String, val value: Float,
            val category: ItemCategory, val createdAt: Date?, val locationId: String) : Parcelable {
 

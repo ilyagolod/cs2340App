@@ -25,20 +25,16 @@ import kotlinx.android.synthetic.main.nav_header_main.view.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    lateinit var locationsAdapter: RecyclerView.Adapter<*>
+    private lateinit var locationsAdapter: RecyclerView.Adapter<*>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-//        fab.setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show()
-//        }
-
         val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+                this, drawer_layout, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
@@ -47,11 +43,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         fab_main.visibility = View.INVISIBLE
 
-        Parse.initialize(Parse.Configuration.Builder(this)
-                .applicationId(getString(R.string.back4app_app_id))
-                .clientKey(getString (R.string.back4app_client_key))
-                .server(getString(R.string.back4app_server_url))
-                .build())
+        Globals.dbHandler.initParse(this)
 
         if (Globals.curUser == null) {
             ParseUser.logOutInBackground()
@@ -60,7 +52,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         val query = ParseQuery.getQuery<ParseObject>("Location")
-        //query.whereEqualTo("playerName", "Dan Stemkoski")
         val objects = query.find()
 
         Globals.locations.clear()
@@ -94,13 +85,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.show_map_main -> {
                 val startIntent = Intent(this, MapActivity::class.java)
                 startActivity(startIntent)
-                return true
+                true
             }
-            else -> return super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -113,7 +104,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_items -> {
                 val startIntent = Intent(this,
                         ItemsViewActivity::class.java).apply {
-                    putExtra("locationIds", Globals.locations.map { x -> x.value.id }.toTypedArray())
+                    putExtra("locationIds",
+                            Globals.locations.map { x -> x.value.id }.toTypedArray())
                 }
                 startActivity(startIntent)
                 finish()
@@ -155,10 +147,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         inner class MyViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
 
-            val textView: TextView
+            val textView: TextView = view.location_list_item_text
 
             init {
-                this.textView = view.location_list_item_text
                 view.setOnLongClickListener {
                     val startIntent = Intent(this@MainActivity,
                             LocationViewActivity::class.java).apply {

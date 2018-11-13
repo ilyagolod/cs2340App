@@ -1,6 +1,6 @@
 package edu.gatech.cs2340.team30.donationtracker.model
 
-enum class ItemCategory(val strName: String) {
+enum class ItemCategory(private val strName: String) {
     Clothing("Clothing"),
     Hat("Hat"),
     Kitchen("Kitchen"),

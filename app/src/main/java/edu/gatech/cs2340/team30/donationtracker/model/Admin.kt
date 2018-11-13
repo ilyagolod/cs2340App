@@ -1,9 +1,10 @@
 package edu.gatech.cs2340.team30.donationtracker.model
 
-class Admin : User {
-    constructor(username: String, password: String)
-            : super(username, password)
+/**
+ * Represents an administrator user
+ */
+class Admin(username: String, password: String, email: String) : User(username, password, email) {
+//    constructor(username: String, password: String)
+//            : super(username, password)
 
-    constructor(username: String, password: String, email: String)
-            : super(username, password, email)
 }

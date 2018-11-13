@@ -2,6 +2,7 @@ package edu.gatech.cs2340.team30.donationtracker.activities
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.support.v7.app.AppCompatActivity
 import android.content.Intent
@@ -12,8 +13,7 @@ import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
-import com.parse.Parse
-import com.parse.ParseInstallation
+import com.parse.*
 import edu.gatech.cs2340.team30.donationtracker.R
 import edu.gatech.cs2340.team30.donationtracker.model.*
 
@@ -50,11 +50,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
 
-        Parse.initialize(Parse.Configuration.Builder(this)
-                .applicationId(getString(R.string.back4app_app_id))
-                .clientKey(getString (R.string.back4app_client_key))
-                .server(getString(R.string.back4app_server_url))
-                .build())
+        Globals.dbHandler.initParse(this)
 
         ParseInstallation.getCurrentInstallation().saveInBackground()
 
@@ -137,35 +133,29 @@ class LoginActivity : AppCompatActivity() {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            val shortAnimTime
-                    = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+        val shortAnimTime
+                = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
-            login_form.visibility = if (show) View.GONE else View.VISIBLE
-            login_form.animate()
-                    .setDuration(shortAnimTime)
-                    .alpha((if (show) 0 else 1).toFloat())
-                    .setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            login_form.visibility = if (show) View.GONE else View.VISIBLE
-                        }
-                    })
+        login_form.visibility = if (show) View.GONE else View.VISIBLE
+        login_form.animate()
+                .setDuration(shortAnimTime)
+                .alpha((if (show) 0 else 1).toFloat())
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        login_form.visibility = if (show) View.GONE else View.VISIBLE
+                    }
+                })
 
-            login_progress.visibility = if (show) View.VISIBLE else View.GONE
-            login_progress.animate()
-                    .setDuration(shortAnimTime)
-                    .alpha((if (show) 1 else 0).toFloat())
-                    .setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            login_progress.visibility = if (show) View.VISIBLE else View.GONE
-                        }
-                    })
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            login_progress.visibility = if (show) View.VISIBLE else View.GONE
-            login_form.visibility = if (show) View.GONE else View.VISIBLE
-        }
+        login_progress.visibility = if (show) View.VISIBLE else View.GONE
+        login_progress.animate()
+                .setDuration(shortAnimTime)
+                .alpha((if (show) 1 else 0).toFloat())
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        login_progress.visibility = if (show) View.VISIBLE else View.GONE
+                    }
+                })
+
     }
 
 
@@ -173,6 +163,7 @@ class LoginActivity : AppCompatActivity() {
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
+    @SuppressLint("StaticFieldLeak")
     inner class UserLoginTask internal constructor(private val mUsername: String,
                                                    private val mPassword: String)
         : AsyncTask<Void, Void, Boolean>() {
@@ -182,7 +173,7 @@ class LoginActivity : AppCompatActivity() {
             val md = MessageDigest.getInstance("SHA-256")
             val hashedPwd = String(md.digest(mPassword.toByteArray()))
 
-            return User.loginUser(this@LoginActivity, mUsername, hashedPwd)
+            return Globals.dbHandler.loginUser(mUsername, hashedPwd)
         }
 
         override fun onPostExecute(success: Boolean?) {

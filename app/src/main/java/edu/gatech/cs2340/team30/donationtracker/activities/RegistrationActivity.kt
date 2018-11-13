@@ -2,22 +2,19 @@ package edu.gatech.cs2340.team30.donationtracker.activities
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import com.parse.Parse
-import com.parse.ParseException
-import com.parse.ParseUser
 import edu.gatech.cs2340.team30.donationtracker.R
-import edu.gatech.cs2340.team30.donationtracker.model.*
-import kotlinx.android.synthetic.main.activity_login.*
-
+import edu.gatech.cs2340.team30.donationtracker.model.Globals
+import edu.gatech.cs2340.team30.donationtracker.model.User
 import kotlinx.android.synthetic.main.activity_register.*
 import java.security.MessageDigest
 
@@ -42,11 +39,7 @@ class RegistrationActivity : AppCompatActivity() {
             finish()
         }
 
-        Parse.initialize(Parse.Configuration.Builder(this)
-                .applicationId(getString(R.string.back4app_app_id))
-                .clientKey(getString (R.string.back4app_client_key))
-                .server(getString(R.string.back4app_server_url))
-                .build())
+        Globals.dbHandler.initParse(this)
 
     }
 
@@ -124,11 +117,10 @@ class RegistrationActivity : AppCompatActivity() {
             // perform the user login attempt.
             showProgress(true)
 
-            val userType: String
-            when(registration_type_spinner.selectedItemId) {
-                0L -> userType = "USER"
-                1L -> userType = "LOCATION_EMPLOYEE"
-                else -> userType = "ADMIN"
+            val userType: String = when(registration_type_spinner.selectedItemId) {
+                0L -> "USER"
+                1L -> "LOCATION_EMPLOYEE"
+                else -> "ADMIN"
             }
 
             mAuthTask = UserRegistrationTask(usernameStr, passwordStr, emailStr, userType)
@@ -158,35 +150,29 @@ class RegistrationActivity : AppCompatActivity() {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            val shortAnimTime
-                    = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+        val shortAnimTime
+                = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
-            registration_form.visibility = if (show) View.GONE else View.VISIBLE
-            registration_form.animate()
-                    .setDuration(shortAnimTime)
-                    .alpha((if (show) 0 else 1).toFloat())
-                    .setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            registration_form.visibility = if (show) View.GONE else View.VISIBLE
-                        }
-                    })
+        registration_form.visibility = if (show) View.GONE else View.VISIBLE
+        registration_form.animate()
+                .setDuration(shortAnimTime)
+                .alpha((if (show) 0 else 1).toFloat())
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        registration_form.visibility = if (show) View.GONE else View.VISIBLE
+                    }
+                })
 
-            registration_progress.visibility = if (show) View.VISIBLE else View.GONE
-            registration_progress.animate()
-                    .setDuration(shortAnimTime)
-                    .alpha((if (show) 1 else 0).toFloat())
-                    .setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            registration_progress.visibility = if (show) View.VISIBLE else View.GONE
-                        }
-                    })
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            registration_progress.visibility = if (show) View.VISIBLE else View.GONE
-            registration_form.visibility = if (show) View.GONE else View.VISIBLE
-        }
+        registration_progress.visibility = if (show) View.VISIBLE else View.GONE
+        registration_progress.animate()
+                .setDuration(shortAnimTime)
+                .alpha((if (show) 1 else 0).toFloat())
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        registration_progress.visibility = if (show) View.VISIBLE else View.GONE
+                    }
+                })
+
     }
 
 
@@ -194,6 +180,7 @@ class RegistrationActivity : AppCompatActivity() {
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
+    @SuppressLint("StaticFieldLeak")
     inner class UserRegistrationTask internal constructor(private val mUsername: String,
                                                           private val mPassword: String,
                                                           private val mEmail: String,
@@ -208,8 +195,7 @@ class RegistrationActivity : AppCompatActivity() {
             val md = MessageDigest.getInstance("SHA-256")
             val hashedPwd = String(md.digest(mPassword.toByteArray()))
 
-            errorCode = User.registerUser(this@RegistrationActivity, mUsername,
-                    hashedPwd, mEmail, mType)
+            errorCode = Globals.dbHandler.registerUser(mUsername, hashedPwd, mEmail, mType)
 
             return errorCode == 0
         }
@@ -223,15 +209,20 @@ class RegistrationActivity : AppCompatActivity() {
                         MainActivity::class.java))
                 finish()
             } else {
-                if (errorCode == 202) {
-                    registration_username_field.error = getString(R.string.user_already_exists)
-                    registration_username_field.requestFocus()
-                } else if (errorCode == 203) {
-                    registration_email_field.error = getString(R.string.email_already_exists)
-                    registration_email_field.requestFocus()
-                } else {
-                    registration_username_field.error = getString(R.string.cannot_connect_to_server)
-                    registration_username_field.requestFocus()
+                when (errorCode) {
+                    202 -> {
+                        registration_username_field.error = getString(R.string.user_already_exists)
+                        registration_username_field.requestFocus()
+                    }
+                    203 -> {
+                        registration_email_field.error = getString(R.string.email_already_exists)
+                        registration_email_field.requestFocus()
+                    }
+                    else -> {
+                        registration_username_field.error =
+                                getString(R.string.cannot_connect_to_server)
+                        registration_username_field.requestFocus()
+                    }
                 }
             }
         }

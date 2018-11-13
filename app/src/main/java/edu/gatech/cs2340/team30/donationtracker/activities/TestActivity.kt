@@ -28,11 +28,7 @@ class TestActivity : AppCompatActivity() {
                     .setAction("Action", null).show()
         }
 
-        Parse.initialize(Parse.Configuration.Builder(this)
-                .applicationId(getString(R.string.back4app_app_id))
-                .clientKey(getString (R.string.back4app_client_key))
-                .server(getString(R.string.back4app_server_url))
-                .build())
+        Globals.dbHandler.initParse(this)
 
 
         val userType = when(Globals.curUser!!::class) {
@@ -40,7 +36,7 @@ class TestActivity : AppCompatActivity() {
             LocationEmployee::class -> "LOCATION_EMPLOYEE"
             else -> "USER"
         }
-        test_textview_test.text = "Your user type is ${userType}"
+        test_textview_test.text = "Your user type is $userType"
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
