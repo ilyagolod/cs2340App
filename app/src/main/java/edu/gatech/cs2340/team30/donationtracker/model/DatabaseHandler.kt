@@ -60,6 +60,8 @@ class DatabaseHandler(val serverUrl: String, val appId: String, val clientKey: S
      * Signs a user up (Parse database used).
      * The operation is conducted in the thread from which the method was invoked.
      *
+     * Error codes: 202 - user already exists, 203 - email already exists, 100 - IO error
+     *
      * @param username username of the user to sign up
      * @param hashedPwd hashed password of the user to sign up
      * @param email email of the user to sign up

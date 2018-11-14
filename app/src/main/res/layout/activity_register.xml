@@ -13,7 +13,6 @@
 
     <!-- Login progress -->
     <ProgressBar
-        android:id="@+id/registration_progress"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,12 +20,10 @@
         android:visibility="gone" />
 
     <ScrollView
-        android:id="@+id/registration_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/username_registration_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -36,7 +33,6 @@
                 android:layout_height="wrap_content">
 
                 <AutoCompleteTextView
-                    android:id="@+id/registration_username_field"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/login"
@@ -51,7 +47,6 @@
                 android:layout_height="wrap_content">
 
                 <AutoCompleteTextView
-                    android:id="@+id/registration_email_field"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/email"
@@ -66,7 +61,6 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/registration_password_field"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/password"
@@ -84,7 +78,6 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/registration_repeat_password_field"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/repeat_password"
@@ -104,14 +97,12 @@
                 android:layout_marginTop="16dp" />
 
             <Spinner
-                android:id="@+id/registration_type_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:entries="@array/user_types" />
 
             <Button
-                android:id="@+id/registration_sign_up_button"
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -120,7 +111,6 @@
                 android:textStyle="bold" />
 
             <Button
-                android:id="@+id/registration_cancel_button"
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

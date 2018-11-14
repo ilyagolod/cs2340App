@@ -5,8 +5,6 @@
     <string name="back4app_server_url">https://parseapi.back4app.com/</string>
     <string name="back4app_app_id">buvWQpgZEZUJcrslHSeypepw6oOUxTCBfFVaTzNN</string>
     <string name="back4app_client_key">RlnFPE0VH4fzb2BNObBFcN62knLP4uHQHFYOvKED</string>
-    <string name="back4app_user_type_col_name">type</string>
-    <string name="back4app_user_locationId_col_name">locationId</string>
 
     <!-- Strings related to login -->
     <string name="login">Login</string>

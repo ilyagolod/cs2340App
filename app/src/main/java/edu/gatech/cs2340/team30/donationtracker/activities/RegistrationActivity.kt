@@ -80,7 +80,7 @@ class RegistrationActivity : AppCompatActivity() {
             registration_password_field.error = getString(R.string.error_field_required)
             focusView = registration_password_field
             cancel = true
-        } else if (!isPasswordValid(passwordStr)) {
+        } else if (!User.isPasswordValid(passwordStr)) {
             registration_password_field.error = getString(R.string.error_invalid_password)
             focusView = registration_password_field
             cancel = true
@@ -91,7 +91,7 @@ class RegistrationActivity : AppCompatActivity() {
             registration_username_field.error = getString(R.string.error_field_required)
             focusView = registration_username_field
             cancel = true
-        } else if (!isUsernameValid(usernameStr)) {
+        } else if (!User.isUsernameValid(usernameStr)) {
             registration_username_field.error = getString(R.string.error_invalid_username)
             focusView = registration_username_field
             cancel = true
@@ -126,16 +126,6 @@ class RegistrationActivity : AppCompatActivity() {
             mAuthTask = UserRegistrationTask(usernameStr, passwordStr, emailStr, userType)
             mAuthTask!!.execute(null as Void?)
         }
-    }
-
-    private fun isUsernameValid(username: String): Boolean {
-        //TODO: Replace this with different logic
-        return true
-    }
-
-    private fun isPasswordValid(password: String): Boolean {
-        //TODO: Replace this with different logic
-        return true
     }
 
     private fun isEmailValid(email: String): Boolean {

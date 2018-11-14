@@ -85,7 +85,7 @@ class LoginActivity : AppCompatActivity() {
             password_field.error = getString(R.string.error_field_required)
             focusView = password_field
             cancel = true
-        } else if (!isPasswordValid(passwordStr)) {
+        } else if (!User.isPasswordValid(passwordStr)) {
             password_field.error = getString(R.string.error_invalid_password)
             focusView = password_field
             cancel = true
@@ -96,7 +96,7 @@ class LoginActivity : AppCompatActivity() {
             username_field.error = getString(R.string.error_field_required)
             focusView = username_field
             cancel = true
-        } else if (!isUsernameValid(usernameStr)) {
+        } else if (!User.isUsernameValid(usernameStr)) {
             username_field.error = getString(R.string.error_invalid_username)
             focusView = username_field
             cancel = true
@@ -114,17 +114,6 @@ class LoginActivity : AppCompatActivity() {
             mAuthTask!!.execute(null as Void?)
         }
     }
-
-    private fun isUsernameValid(username: String): Boolean {
-        //TODO: Replace this with different logic
-        return true
-    }
-
-    private fun isPasswordValid(password: String): Boolean {
-        //TODO: Replace this with different logic
-        return true
-    }
-
     /**
      * Shows the progress UI and hides the login form.
      */

@@ -18,7 +18,6 @@
         tools:layout_editor_absoluteY="246dp" />
 
     <TextView
-        android:id="@+id/name_textview_item_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="None"
@@ -34,7 +33,6 @@
         tools:layout_editor_absoluteY="246dp" />
 
     <TextView
-        android:id="@+id/category_textview_item_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Nonet"
@@ -50,7 +48,6 @@
         tools:layout_editor_absoluteY="246dp" />
 
     <TextView
-        android:id="@+id/value_textview_item_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="None"
@@ -66,7 +63,6 @@
         tools:layout_editor_absoluteY="246dp" />
 
     <TextView
-        android:id="@+id/time_textview_item_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="None"
@@ -82,7 +78,6 @@
         tools:layout_editor_absoluteY="246dp" />
 
     <TextView
-        android:id="@+id/description_textview_item_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="None"
